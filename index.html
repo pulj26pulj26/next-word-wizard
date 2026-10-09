@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>接龙小作家 · 越读越会写</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#FFF9EF;color:#33261A;min-height:100vh}
+#app{max-width:680px;margin:0 auto;padding:18px 16px 40px}
+.hidden{display:none!important}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.logo{font-size:20px;font-weight:800;color:#33261A}
+.logo em{color:#E8703A;font-style:normal}
+.badges{display:flex;gap:6px}
+.badge{width:38px;height:38px;border-radius:50%;background:#F6EBD8;border:2px solid #EAD9BE;display:flex;align-items:center;justify-content:center;font-size:19px;opacity:.35;transition:all .4s}
+.badge.on{opacity:1;border-color:#E8703A;background:#fff;transform:scale(1.08)}
+.screen{background:#fff;border:3px solid #33261A;border-radius:22px;padding:26px 20px;box-shadow:0 6px 0 #EAD9BE}
+h1{font-size:30px;line-height:1.35;margin:10px 0 6px;text-align:center}
+.sub{text-align:center;color:#8A7A66;font-size:15px;line-height:1.8;margin-bottom:8px}
+.hero{text-align:center;font-size:64px;margin:14px 0 4px}
+.btn{display:block;width:100%;max-width:320px;margin:18px auto 6px;padding:16px 22px;font-size:19px;font-weight:800;color:#fff;background:#E8703A;border:none;border-radius:999px;box-shadow:0 5px 0 #B54E21;cursor:pointer;transition:transform .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #B54E21}
+.btn.green{background:#3F7A5A;box-shadow:0 5px 0 #2C5840}
+.btn.green:active{box-shadow:0 1px 0 #2C5840}
+.hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.lvname{font-size:15px;font-weight:800;color:#3F7A5A;background:#EAF3ED;border-radius:999px;padding:6px 14px}
+.progress{font-size:14px;color:#8A7A66}
+.coach{display:flex;gap:10px;align-items:flex-start;background:#F6EBD8;border-radius:16px;padding:12px 14px;margin-bottom:14px;min-height:64px}
+.coach .face{font-size:30px;flex:none}
+.coach .bubble{font-size:15px;line-height:1.7}
+.card{background:#FFF9EF;border:2px dashed #EAD9BE;border-radius:16px;padding:20px 16px;margin-bottom:14px;text-align:center}
+.modehint{font-size:13px;color:#E8703A;font-weight:700;margin-bottom:10px}
+.sline{font-size:21px;line-height:2;font-weight:700}
+.sline.ex{color:#8A7A66;font-size:17px}
+.blank{display:inline-block;min-width:56px;padding:0 8px;margin:0 2px;border-bottom:4px solid #E8703A;color:#E8703A}
+.fill{display:inline-block;min-width:56px;padding:0 8px;margin:0 2px;border-bottom:4px solid #3F7A5A;color:#3F7A5A;animation:pop .45s}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.chips{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.chip{padding:15px 18px;font-size:19px;font-weight:800;color:#33261A;background:#fff;border:3px solid #33261A;border-radius:999px;box-shadow:0 4px 0 #EAD9BE;cursor:pointer;transition:transform .08s;text-align:center}
+.chip.small{font-size:15px;font-weight:600;text-align:left;border-radius:18px;line-height:1.5}
+.chip:active{transform:translateY(3px);box-shadow:0 1px 0 #EAD9BE}
+.chip.lit{background:#3F7A5A;color:#fff;border-color:#2C5840;box-shadow:0 4px 0 #2C5840;animation:pop .45s}
+.chip.dead{opacity:.35;pointer-events:none}
+.chip.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.tiplabel{text-align:center;font-size:13px;color:#8A7A66;margin-top:12px}
+#overlay{position:fixed;inset:0;background:rgba(51,38,26,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+.ovcard{background:#FFF9EF;border-radius:22px;border:3px solid #33261A;padding:28px 22px;max-width:420px;width:100%;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.2)}
+.ovcard .big{font-size:64px;margin:6px 0}
+.ovcard h2{font-size:24px;margin-bottom:8px}
+.ovcard p{font-size:15px;color:#8A7A66;line-height:1.8}
+.cert{border:4px double #E8703A;border-radius:18px;padding:24px 18px;background:#FFFDF6;text-align:center;margin-top:8px}
+.cert .cicon{font-size:56px}
+.cert h2{font-size:24px;color:#E8703A;margin:8px 0 2px}
+.cert .cname{font-size:19px;font-weight:800;margin:6px 0}
+.cert .cline{font-size:14px;color:#8A7A66;line-height:1.9}
+.cert .cbadges{font-size:30px;letter-spacing:8px;margin:10px 0}
+.stats{display:flex;justify-content:center;gap:18px;margin:12px 0;font-size:14px;color:#3F7A5A;font-weight:700}
+.foot{text-align:center;font-size:12px;color:#8A7A66;margin-top:18px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="logo">接龙<em>小作家</em> · 越读越会写</div>
+    <div class="badges">
+      <div class="badge" id="badge0">🐲</div>
+      <div class="badge" id="badge1">⚡</div>
+      <div class="badge" id="badge2">🔍</div>
+    </div>
+  </div>
+
+  <!-- 开始页 -->
+  <div class="screen" id="scr-start">
+    <div class="hero">🐲📚</div>
+    <h1>我说上半句，<br>你接下半句！</h1>
+    <p class="sub">2020 年，读了「半个互联网」的 GPT-3 睁开眼睛——<br>没人教它写作文，它居然自己就会了！<br>科学家叫它「<b>大力出奇迹</b>」。<br>它的绝招只有一招：<b>接下一句</b>。<br>小心！它有时还会一本正经地胡说八道……</p>
+    <button class="btn" id="btn-start">开始接龙 ✍️</button>
+    <p class="tiplabel">闯关成功可获「GPT 大力小作家证书」</p>
+  </div>
+
+  <!-- 游戏页 -->
+  <div class="screen hidden" id="scr-game">
+    <div class="hud">
+      <div class="lvname" id="lvname">第一关 · 顺口接龙</div>
+      <div class="progress" id="progress">1 / 4</div>
+    </div>
+    <div class="coach">
+      <div class="face">🤖</div>
+      <div class="bubble" id="coach">我是小 G，读了半个互联网的接龙王！听得多，就会接——你也来试试！</div>
+    </div>
+    <div class="card">
+      <div class="modehint" id="modehint">接下一句：哪个词被接得最多？</div>
+      <div id="lines"></div>
+    </div>
+    <div class="chips">
+      <button class="chip" id="chip0"></button>
+      <button class="chip" id="chip1"></button>
+      <button class="chip" id="chip2"></button>
+    </div>
+    <button class="btn green hidden" id="btn-next">下一题 ➜</button>
+  </div>
+
+  <!-- 过关弹层 -->
+  <div id="overlay" class="hidden">
+    <div class="ovcard">
+      <div class="big" id="ov-icon">🐲</div>
+      <h2 id="ov-title">接龙新星到手！</h2>
+      <p id="ov-text">顺口接龙全拿下，语感热身完成！</p>
+      <button class="btn" id="btn-continue">进入下一关 🚀</button>
+    </div>
+  </div>
+
+  <!-- 证书页 -->
+  <div class="screen hidden" id="scr-cert">
+    <div class="cert">
+      <div class="cicon">🏅</div>
+      <h2>GPT 大力小作家证书</h2>
+      <div class="cname">授予：接龙小作家</div>
+      <div class="cline">你会<b>接下一句</b>、会<b>看例子猜规律</b>，<br>还能抓出 AI 一本正经的胡说八道——<br>这正是 2020 年 GPT-3「大力出奇迹」的本领！</div>
+      <div class="cbadges">🐲 ⚡ 🔍</div>
+      <div class="stats"><span id="st-hits"></span><span id="st-miss"></span></div>
+    </div>
+    <button class="btn" id="btn-again">再玩一次 🔁</button>
+    <p class="tiplabel">截图发到群里，领取你的电子奖状！</p>
+  </div>
+
+  <div class="foot">和孩子一起学AI · AI十哲 第九课《GPT-3》</div>
+</div>
+<div id="testlog" style="display:none"></div>
+<script>
+(function(){
+"use strict";
+var AUTO = location.search.indexOf('autotest') >= 0;
+var D = function(ms){ return AUTO ? 20 : ms; };
+var timers = [];
+function later(fn,ms){ timers.push(setTimeout(fn, D(ms))); }
+function clearTimers(){ for(var i=0;i<timers.length;i++) clearTimeout(timers[i]); timers=[]; }
+function $(id){ return document.getElementById(id); }
+
+var HINTS = {
+  chain:'接下一句：哪个词被接得最多？',
+  pattern:'没人教规则——看两个例子，猜规律！',
+  fake:'三句话里，哪句是小 G 一本正经编的？'
+};
+
+var LEVELS = [
+  { name:'第一关 · 顺口接龙', badge:'🐲', badgeName:'接龙新星',
+    ov:'顺口接龙全拿下！你的语感已经很像小 G 了——下一关，看例子猜规律。',
+    rounds:[
+      {mode:'chain', lines:['生日蛋糕上插着 ___ 。'], c:['蜡烛','钉子','恐龙'], ans:0, trap:1,
+       why:'「蜡烛」是生日蛋糕的老搭档——半个互联网都这么接！',
+       trapTip:'钉子也能「插着」，语法是通的——可生日蛋糕插钉子，谁还敢许愿呀？读着通 ≠ 对！'},
+      {mode:'chain', lines:['一寸光阴一寸 ___ 。'], c:['金','铁','糖'], ans:0, trap:1,
+       why:'这句老话人人都接「金」——光阴比金子还珍贵！',
+       trapTip:'「一寸铁」读着也顺口？可老话里，光阴要配最珍贵的金子——顺口不等于对！'},
+      {mode:'chain', lines:['红灯停，绿灯 ___ 。'], c:['行','飞','躺'], ans:0, trap:1,
+       why:'交通规则人人都背过——红灯停，绿灯行！',
+       trapTip:'绿灯「飞」？过马路可不能飞——这句接的是规则，不是想象力！'},
+      {mode:'chain', lines:['小蜜蜂，嗡嗡嗡，飞到花丛采 ___ 。'], c:['蜜','球','作业'], ans:0, trap:1,
+       why:'儿歌里的蜜蜂永远是去采蜜——听得多，就会接！',
+       trapTip:'蜜蜂采球？儿歌里可没有这一句——想想蜜蜂最喜欢什么！'}
+    ]},
+  { name:'第二关 · 举一反三', badge:'⚡', badgeName:'举一反三',
+    ov:'没人教规则也能猜出来——你刚刚用的就是 GPT-3 最神奇的「举一反三」！',
+    rounds:[
+      {mode:'pattern', lines:['苹果 → 水果','白菜 → 蔬菜','西瓜 → ___'], c:['水果','蔬菜','恐龙'], ans:0, trap:1,
+       why:'例子摆着呢：苹果白菜各回各家，西瓜当然进水果家！',
+       trapTip:'西瓜是蔬菜？看看例子——苹果进了水果家，西瓜和苹果是同一类！'},
+      {mode:'pattern', lines:['猫 → 喵','狗 → 汪','公鸡 → ___'], c:['喔喔','汪汪','嘟嘟'], ans:0, trap:1,
+       why:'规律是「动物接自己的叫声」——公鸡当然说「喔喔」！',
+       trapTip:'汪汪是小狗的叫声！例子说了：每个动物接自己的声音——公鸡要接「喔喔」。'},
+      {mode:'pattern', lines:['向上 → 向下','大 → 小','高 → ___'], c:['矮','高','甜'], ans:0, trap:2,
+       why:'规律是「找对面」——高的对面是矮！',
+       trapTip:'高和甜不是一对反义词——看例子：向上对向下、大对小，都要找「对面」！'},
+      {mode:'pattern', lines:['春 → 夏','夏 → 秋','秋 → ___'], c:['冬','春','雨'], ans:0, trap:1,
+       why:'四季排排队：春夏秋冬——秋的后面是冬！',
+       trapTip:'春是四季的老大，可它排在最前面——秋的后面跟着的是冬！'}
+    ]},
+  { name:'第三关 · 胡说八道探测器', badge:'🔍', badgeName:'打假侦探',
+    ov:'',
+    rounds:[
+      {mode:'fake', lines:['🤖 小 G 自信满满地说了三句话，','其中一句是它编的——抓出它！'], c:['北极熊的毛毛看起来是白色的','袋鼠的口袋朝前开，小袋鼠住在里面','蜗牛是世界上跑得最快的动物，时速 200 公里'], ans:2, trap:0,
+       why:'蜗牛时速 200 公里？它一小时只能爬几米——小 G 说得太自信，露馅了！自信 ≠ 正确！',
+       trapTip:'这句是真的哦！再找找哪句是编的。',
+       wrongTip:'这句是真的哦！再找找哪句是编的。'},
+      {mode:'fake', lines:['🤖 小 G 又说了三句话，','哪句是它一本正经编的？'], c:['猫头鹰的眼睛不会转，只能靠转脑袋看四周','鱼儿睡觉时会找一张小床，盖上水草被子','蜜蜂跳舞是在告诉同伴花蜜的方向'], ans:1, trap:0,
+       why:'鱼没有小床，也不盖被子——小 G 把童话当真事讲了！',
+       trapTip:'这句是真的哦！再找找哪句是编的。',
+       wrongTip:'这句是真的哦！再找找哪句是编的。'},
+      {mode:'fake', lines:['🤖 最后一轮！','哪句是小 G 编出来的？'], c:['章鱼有三颗心脏，血液是蓝色的','大象每天要吃一百多公斤食物','月亮是一颗巨大的奶酪，环形山是小老鼠啃出来的'], ans:2, trap:0,
+       why:'月亮是奶酪？这是童话不是事实！章鱼有三颗心脏倒是真的——所以更要查证！',
+       trapTip:'这句是真的哦！听起来不可思议，但查证过是真的。',
+       wrongTip:'这句是真的哦！听起来不可思议，但查证过是真的。'}
+    ]}
+];
+
+var S = { scr:'start', level:0, round:0, phase:'idle', answer:-1, trap:-1,
+          hits:0, mistakes:0, badges:[], done:false, overlay:false };
+
+function syncDBG(){
+  window.__DBG = { state:function(){ return {
+    scr:S.scr, level:S.level, round:S.round, phase:S.phase,
+    answer:S.answer, trap:S.trap, hits:S.hits, mistakes:S.mistakes,
+    badges:S.badges.slice(), done:S.done, overlay:S.overlay }; } };
+}
+
+function typeBubble(el, text){
+  clearTimers();
+  if(AUTO){ el.textContent = text; return; }
+  el.textContent = '';
+  var i = 0;
+  (function tick(){
+    if(i <= text.length){ el.textContent = text.slice(0, i); i++; later(tick, 28); }
+  })();
+}
+
+function show(id){ $(id).classList.remove('hidden'); }
+function hide(id){ $(id).classList.add('hidden'); }
+
+function renderLines(R, filled){
+  var html = '';
+  for(var i=0;i<R.lines.length;i++){
+    var ln = R.lines[i];
+    var cls = (R.mode==='pattern' && i < R.lines.length-1) ? 'sline ex' : 'sline';
+    if(R.mode==='fake') cls = 'sline ex';
+    if(filled){
+      ln = ln.replace('___', '<span class="fill">' + R.c[R.ans] + '</span>');
+    } else {
+      ln = ln.replace('___', '<span class="blank">？</span>');
+    }
+    html += '<div class="' + cls + '">' + ln + '</div>';
+  }
+  $('lines').innerHTML = html;
+}
+
+function loadRound(){
+  var L = LEVELS[S.level], R = L.rounds[S.round];
+  S.phase = 'pick'; S.answer = R.ans; S.trap = R.trap; S.overlay = false;
+  $('lvname').textContent = L.name;
+  $('progress').textContent = (S.round+1) + ' / ' + L.rounds.length;
+  $('modehint').textContent = HINTS[R.mode];
+  renderLines(R, false);
+  for(var i=0;i<3;i++){
+    var ch = $('chip'+i);
+    ch.textContent = R.c[i];
+    ch.className = 'chip' + (R.mode==='fake' ? ' small' : '');
+  }
+  hide('btn-next');
+  var tip = '小 G 提示：想想这个词被接得最多！';
+  if(R.mode==='pattern') tip = '小 G 提示：例子就是老师，照样子推！';
+  if(R.mode==='fake') tip = '小 G 提示：我说得再自信，也可能是编的……';
+  typeBubble($('coach'), tip);
+  syncDBG();
+}
+
+function pick(i){
+  if(S.scr !== 'game' || S.phase !== 'pick') return;
+  var L = LEVELS[S.level], R = L.rounds[S.round];
+  var ch = $('chip'+i);
+  if(ch.classList.contains('dead')) return;
+  if(i === S.answer){
+    S.phase = 'reveal'; S.hits++;
+    ch.classList.add('lit');
+    if(R.mode !== 'fake') renderLines(R, true);
+    for(var k=0;k<3;k++) if(k!==i) $('chip'+k).classList.add('dead');
+    typeBubble($('coach'), '🎉 答对了！' + R.why);
+    later(function(){ show('btn-next'); }, 500);
+  } else {
+    S.mistakes++;
+    if(i === S.trap){
+      typeBubble($('coach'), '⚠️ ' + R.trapTip);
+    } else {
+      typeBubble($('coach'), '😆 ' + (R.wrongTip || '这个词接不上去！再读一遍句子。'));
+    }
+    ch.classList.add('shake');
+    later(function(){ ch.classList.remove('shake'); ch.classList.add('dead'); }, 420);
+  }
+  syncDBG();
+}
+
+function next(){
+  if(S.scr !== 'game' || S.phase !== 'reveal') return;
+  var L = LEVELS[S.level];
+  S.round++;
+  if(S.round >= L.rounds.length){
+    S.badges.push(L.badge);
+    $('badge'+S.level).classList.add('on');
+    if(S.level >= LEVELS.length-1){
+      S.done = true; S.scr = 'cert';
+      hide('scr-game'); show('scr-cert');
+      $('st-hits').textContent = '✅ 答对 ' + S.hits + ' 题';
+      $('st-miss').textContent = '🕳️ 踩坑 ' + S.mistakes + ' 次';
+    } else {
+      S.overlay = true;
+      $('ov-icon').textContent = L.badge;
+      $('ov-title').textContent = L.badgeName + '到手！';
+      $('ov-text').textContent = L.ov;
+      show('overlay');
+    }
+  } else {
+    loadRound();
+  }
+  syncDBG();
+}
+
+function cont(){
+  if(!$('overlay') || $('overlay').classList.contains('hidden')) return;
+  hide('overlay');
+  S.overlay = false;
+  S.level++; S.round = 0;
+  loadRound();
+}
+
+function start(){
+  S.scr = 'game'; S.level = 0; S.round = 0;
+  S.hits = 0; S.mistakes = 0; S.badges = []; S.done = false; S.overlay = false;
+  hide('scr-start'); hide('scr-cert'); show('scr-game');
+  for(var i=0;i<3;i++) $('badge'+i).classList.remove('on');
+  loadRound();
+}
+
+function resetAll(){
+  S.scr='start'; S.level=0; S.round=0; S.phase='idle'; S.answer=-1; S.trap=-1;
+  S.hits=0; S.mistakes=0; S.badges=[]; S.done=false; S.overlay=false;
+  clearTimers();
+  hide('scr-game'); hide('scr-cert'); hide('overlay'); show('scr-start');
+  for(var i=0;i<3;i++) $('badge'+i).classList.remove('on');
+  syncDBG();
+}
+
+function softRestart(){ try{ location.reload(); }catch(e){} setTimeout(resetAll, 400); }
+
+$('btn-start').addEventListener('click', start);
+$('btn-next').addEventListener('click', next);
+$('btn-continue').addEventListener('click', cont);
+$('btn-again').addEventListener('click', softRestart);
+for(var i=0;i<3;i++){
+  (function(idx){ $('chip'+idx).addEventListener('click', function(){ pick(idx); }); })(i);
+}
+syncDBG();
+})();
+</script>
+</body>
+</html>
